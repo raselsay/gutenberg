@@ -622,20 +622,21 @@ class WP_Theme_JSON {
 	 *     --wp--custom--variable: value;
 	 *   }
 	 *
+	 * @param array $block_list The list of blocks to process.
+	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_css_variables() {
+	private function get_css_variables( $block_list ) {
 		$stylesheet = '';
 		if ( ! isset( $this->theme_json['settings'] ) ) {
 			return $stylesheet;
 		}
 
-		$metadata = self::get_blocks_metadata();
-		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
-			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
+		foreach ( $this->theme_json['settings'] as $name => $settings ) {
+			if ( empty( $block_list[ $name ]['selector'] ) ) {
 				continue;
 			}
-			$selector = $metadata[ $block_selector ]['selector'];
+			$selector = $block_list[ $name ]['selector'];
 
 			$declarations = self::compute_preset_vars( array(), $settings );
 			$declarations = self::compute_theme_vars( $declarations, $settings );
@@ -681,18 +682,19 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
+	 * @param array $block_list The list of blocks to process.
+	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_block_styles() {
+	private function get_block_styles( $block_list ) {
 		$stylesheet = '';
 		if ( ! isset( $this->theme_json['styles'] ) && ! isset( $this->theme_json['settings'] ) ) {
 			return $stylesheet;
 		}
 
-		$metadata     = self::get_blocks_metadata();
 		$block_rules  = '';
 		$preset_rules = '';
-		foreach ( $metadata as $block_selector => $metadata ) {
+		foreach ( $block_list as $name => $metadata ) {
 			if ( empty( $metadata['selector'] ) ) {
 				continue;
 			}
@@ -700,19 +702,19 @@ class WP_Theme_JSON {
 			$selector = $metadata['selector'];
 
 			$declarations = array();
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
+			if ( isset( $this->theme_json['styles'][ $name ] ) ) {
 				$declarations = self::compute_style_properties(
 					$declarations,
-					$this->theme_json['styles'][ $block_selector ]
+					$this->theme_json['styles'][ $name ]
 				);
 			}
 
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			// Attach the rulesets for the classes.
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
+			if ( isset( $this->theme_json['settings'][ $name ] ) ) {
 				$preset_rules .= self::compute_preset_classes(
-					$this->theme_json['settings'][ $block_selector ],
+					$this->theme_json['settings'][ $name ],
 					$selector
 				);
 			}
@@ -800,13 +802,14 @@ class WP_Theme_JSON {
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $type = 'all' ) {
+		$block_list = self::get_blocks_metadata();
 		switch ( $type ) {
 			case 'block_styles':
-				return $this->get_block_styles();
+				return $this->get_block_styles( $block_list );
 			case 'css_variables':
-				return $this->get_css_variables();
+				return $this->get_css_variables( $block_list );
 			default:
-				return $this->get_css_variables() . $this->get_block_styles();
+				return $this->get_css_variables( $block_list ) . $this->get_block_styles( $block_list );
 		}
 	}
 
