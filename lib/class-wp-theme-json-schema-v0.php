@@ -115,7 +115,7 @@ class WP_Theme_JSON_Schema_V0 {
 		$output = array();
 
 		if ( ! is_array( $input ) ) {
-			return;
+			return $output;
 		}
 
 		// Remove top-level keys that aren't present in the schema.
@@ -209,4 +209,99 @@ class WP_Theme_JSON_Schema_V0 {
 		return $tree;
 	}
 
+	public static function to_v1( $old, $version ) {
+		// Copy everything.
+		$new = $old;
+
+		// Overwrite the things that change.
+		$new['settings'] = self::process_settings( $old['settings'] );
+		$new['styles']   = self::process_styles( $old['styles'] );
+		$new['version']  = $version;
+
+		return $new;
+	}
+
+	private static function process_settings( $settings ) {
+		$new = array();
+
+		// Styles within defaults become top-level.
+		if ( isset( $settings[ WP_Theme_JSON::ALL_BLOCKS_NAME] ) ) {
+			$new = $settings[ WP_Theme_JSON::ALL_BLOCKS_NAME ];
+			unset( $settings[ WP_Theme_JSON::ALL_BLOCKS_NAME ] );
+		}
+
+		// Styles within root become top-level and overwrite the defaults.
+		if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ] ) ) {
+			$new = array_replace_recursive( $new, $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ] );
+
+			// The array_replace_recursive algorithm merges at the leaf level.
+			// This means that when a leaf value is an array,
+			// the incoming array won't replace the existing,
+			// but the numeric indexes are used for replacement.
+			//
+			// These are the cases that have array values at the leaf levels:
+			//
+			// Color presets: palette & gradients.
+			if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['color']['palette'] ) ) {
+				$new['color']['palette'] = $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['color']['palette'];
+			}
+			if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['color']['gradients'] ) ) {
+				$new['color']['gradients'] = $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['color']['gradients'];
+			}
+			// Spacing: units.
+			if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['spacing']['units'] ) ) {
+				$new['spacing']['units'] = $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['spacing']['units'];
+			}
+			// Typography presets: fontSizes & fontFamilies.
+			if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['typography']['fontSizes'] ) ) {
+				$new['typography']['fontSizes'] = $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['typography']['fontSizes'];
+			}
+			if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['typography']['fontFamilies'] ) ) {
+				$new['typography']['fontFamilies'] = $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['typography']['fontFamilies'];
+			}
+			// Custom section.
+			if ( isset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['custom'] ) ) {
+				$new['custom'] = $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ]['custom'];
+			}
+
+			unset( $settings[ WP_Theme_JSON::ROOT_BLOCK_NAME ] );
+		}
+
+		// It only contains block's data, copy over.
+		if ( ! empty( $settings ) ) {
+			$new['blocks'] = $settings;
+		}
+
+		return $new;
+	}
+
+	private static function process_styles( $styles ) {
+		$new = array();
+
+		// Styles within root become top-level.
+		if ( isset( $styles[ WP_Theme_JSON::ROOT_BLOCK_NAME ] ) ) {
+			$new = $styles[ WP_Theme_JSON::ROOT_BLOCK_NAME ];
+			unset( $styles[ WP_Theme_JSON::ROOT_BLOCK_NAME ] );
+
+			// Transform root.styles.color.link into elements.link.color.text.
+			if ( isset( $new['color']['link'] ) ) {
+				$new['elements']['link']['color']['text'] = $new['color']['link'];
+				unset( $new['color']['link'] );
+			}
+		}
+
+		// It only contains block's data, copy over.
+		if ( ! empty( $styles ) ) {
+			$new['blocks'] = $styles;
+			foreach( $new['blocks'] as $block_name => $metadata ) {
+				// Transform root.styles.color.link into elements.link.color.text.
+				if ( isset( $metadata['color']['link'] ) ) {
+					$new['blocks'][ $block_name ]['elements']['link']['color']['text'] = $metadata['color']['link'];
+					unset( $new['blocks'][ $block_name ]['color']['link'] );
+				}
+			}
+		}
+
+		return $new;
+	}
 }

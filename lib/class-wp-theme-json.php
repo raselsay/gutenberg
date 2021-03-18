@@ -200,8 +200,15 @@ class WP_Theme_JSON {
 	 * @param array $theme_json A structure that follows the theme.json schema.
 	 */
 	public function __construct( $theme_json = array() ) {
-		$blocks_metadata  = self::get_blocks_metadata();
-		$this->theme_json = WP_Theme_JSON_Schema_V0::sanitize( $theme_json, $blocks_metadata );
+		$block_list = self::get_blocks_metadata();
+		$version    = 1;
+
+		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version']) {
+			$sanitized        = WP_Theme_JSON_Schema_V0::sanitize( $theme_json, $block_list );
+			$this->theme_json = WP_Theme_JSON_Schema_V0::to_v1( $sanitized, $version );
+		} else {
+			$this->theme_json = array( 'version' => $version );
+		}
 	}
 
 	/**
