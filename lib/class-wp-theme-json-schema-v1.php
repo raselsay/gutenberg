@@ -86,12 +86,14 @@ class WP_Theme_JSON_Schema_V1 {
 				unset( $output[ $subtree ] );
 			}
 
-			// Remove invalid keys according to the schema of the subtree.
-			$output[ $subtree ] = self::remove_keys_not_in_schema(
-				$output[ $subtree ],
-				// The 'blocks' key can be part of the top-level for each subtree.
-				array_merge( self::SCHEMA[ $subtree ], array( 'blocks' => null ) )
-			);
+			// Remove invalid keys according to the schema of the subtree:
+			// - settings: top-level keys in schema + 'blocks'
+			// - styles: top-level keys in schema + 'blocks' + 'elements'
+			$schema_for_subtree = array_merge( self::SCHEMA[ $subtree ], array( 'blocks' => null ) );
+			if ( 'styles' === $subtree ) {
+				$schema_for_subtree = array_merge( $schema_for_subtree, array( 'elements' => null ) );
+			}
+			$output[ $subtree ] = self::remove_keys_not_in_schema( $output[ $subtree ], $schema_for_subtree );
 
 			// Remove block selectors subtrees declared within settings & styles if that aren't registered.
 			if ( isset( $output[ $subtree ]['blocks'] ) ) {
@@ -108,10 +110,9 @@ class WP_Theme_JSON_Schema_V1 {
 					continue;
 				}
 
-				$styles_schema                                = self::SCHEMA['styles'];
 				$output['styles']['blocks'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$output['styles']['blocks'][ $block_selector ],
-					$styles_schema
+					array_merge( self::SCHEMA['styles'], array( 'elements' => null) )
 				);
 
 				// Remove the block selector subtree if it is empty after having processed it.

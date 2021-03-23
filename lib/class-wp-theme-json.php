@@ -426,6 +426,16 @@ class WP_Theme_JSON {
 		return false;
 	}
 
+	private static function compute_elements( $declarations, $chunk ) {
+		if ( isset( $chunk['elements']['link']['color']['text'] ) ) {
+			$declarations[] = array(
+				'name'  => '--wp--style--color--link',
+				'value' => $chunk['elements']['link']['color']['text']
+			);
+		}
+		return $declarations;
+	}
+
 	/**
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
@@ -637,11 +647,20 @@ class WP_Theme_JSON {
 	 */
 	private function get_css_variables( $block_list ) {
 		$stylesheet = '';
+
+		// Process top-level keys.
 		if ( ! isset( $this->theme_json['settings'] ) ) {
 			return $stylesheet;
 		}
+		$declarations = self::compute_preset_vars( array(), $this->theme_json['settings']);
+		$declarations = self::compute_theme_vars( $declarations, $this->theme_json['settings'] );
+		$stylesheet .= self::to_ruleset( self::ROOT_BLOCK_SELECTOR, $declarations );
 
-		foreach ( $this->theme_json['settings'] as $name => $settings ) {
+		// Process 'blocks'.
+		if ( ! isset( $this->theme_json['settings']['blocks'] ) ) {
+			return $stylesheet;
+		}
+		foreach ( $this->theme_json['settings']['blocks'] as $name => $settings ) {
 			if ( empty( $block_list[ $name ]['selector'] ) ) {
 				continue;
 			}
@@ -653,6 +672,7 @@ class WP_Theme_JSON {
 			// Attach the ruleset for style and custom properties.
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
+
 		return $stylesheet;
 	}
 
@@ -703,6 +723,20 @@ class WP_Theme_JSON {
 
 		$block_rules  = '';
 		$preset_rules = '';
+
+		// Process top-level styles, elements, and settings
+		$elements            = self::compute_elements( array(), $this->theme_json['styles'] );
+		$styles              = self::compute_style_properties( $elements, $this->theme_json['styles'] );
+		$block_rules        .= self::to_ruleset(
+			self::ROOT_BLOCK_SELECTOR,
+			$styles
+		);
+		$preset_rules       .= self::compute_preset_classes(
+			$this->theme_json['settings'],
+			self::ROOT_BLOCK_SELECTOR
+		);
+
+		// Process 'blocks'.
 		foreach ( $block_list as $name => $metadata ) {
 			if ( empty( $metadata['selector'] ) ) {
 				continue;
@@ -711,19 +745,23 @@ class WP_Theme_JSON {
 			$selector = $metadata['selector'];
 
 			$declarations = array();
-			if ( isset( $this->theme_json['styles'][ $name ] ) ) {
+			if ( isset( $this->theme_json['styles']['blocks'][ $name ] ) ) {
+				$declarations = self::compute_elements(
+					$declarations,
+					$this->theme_json['styles']['blocks'][ $name ]
+				);
 				$declarations = self::compute_style_properties(
 					$declarations,
-					$this->theme_json['styles'][ $name ]
+					$this->theme_json['styles']['blocks'][ $name ]
 				);
 			}
 
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 
 			// Attach the rulesets for the classes.
-			if ( isset( $this->theme_json['settings'][ $name ] ) ) {
+			if ( isset( $this->theme_json['settings']['blocks'][ $name ] ) ) {
 				$preset_rules .= self::compute_preset_classes(
-					$this->theme_json['settings'][ $name ],
+					$this->theme_json['settings']['blocks'][ $name ],
 					$selector
 				);
 			}
