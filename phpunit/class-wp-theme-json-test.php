@@ -8,7 +8,7 @@
 
 class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
-	function test_get_settings() {
+	function test_get_settings_v0() {
 		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$theme_json = new WP_Theme_JSON(
 			array(
@@ -30,17 +30,62 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$result = $theme_json->get_settings();
+		$actual = $theme_json->get_settings();
 
 		$expected = array(
-			$root_name => array(
-				'color' => array(
-					'custom' => false,
+			'color' => array(
+				'custom' => false,
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_settings_v1() {
+		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'version'  => 1,
+				'settings' => array(
+					'color'       => array(
+						'custom' => false,
+					),
+					'invalid/key' => 'value',
+					'blocks' => array(
+						'core/group' => array(
+							'color'       => array(
+								'custom' => false,
+							),
+							'invalid/key' => 'value',
+						),
+					),
+				),
+				'styles'   => array(
+					$root_name => array(
+						'color' => array(
+							'link' => 'blue',
+						),
+					),
+				),
+			)
+		);
+
+		$actual = $theme_json->get_settings();
+
+		$expected = array(
+			'color' => array(
+				'custom' => false,
+			),
+			'blocks' => array(
+				'core/group' => array(
+					'color' => array(
+						'custom' => false,
+					),
 				),
 			),
 		);
 
-		$this->assertEqualSetsWithIndex( $expected, $result );
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_get_stylesheet() {

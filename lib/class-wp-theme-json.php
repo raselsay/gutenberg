@@ -206,6 +206,8 @@ class WP_Theme_JSON {
 		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version']) {
 			$sanitized        = WP_Theme_JSON_Schema_V0::sanitize( $theme_json, $block_list );
 			$this->theme_json = WP_Theme_JSON_Schema_V0::to_v1( $sanitized, $version );
+		} else if ( isset( $theme_json['version'] ) && 1 === $theme_json['version'] ) {
+			$this->theme_json = WP_Theme_JSON_Schema_V1::sanitize( $theme_json, $block_list );
 		} else {
 			$this->theme_json = array( 'version' => $version );
 		}
