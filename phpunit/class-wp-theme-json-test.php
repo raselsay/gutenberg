@@ -334,85 +334,89 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	}
 
 	public function test_merge_incoming_data() {
-		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		$initial   = array(
+			'version'  => 1,
 			'settings' => array(
-				$root_name       => array(
-					'color' => array(
-						'custom'  => false,
-						'palette' => array(
-							array(
-								'slug'  => 'red',
-								'color' => 'red',
-							),
-							array(
-								'slug'  => 'green',
-								'color' => 'green',
-							),
+				'color' => array(
+					'custom'  => false,
+					'palette' => array(
+						array(
+							'slug'  => 'red',
+							'color' => 'red',
+						),
+						array(
+							'slug'  => 'green',
+							'color' => 'green',
 						),
 					),
 				),
-				'core/paragraph' => array(
-					'color' => array(
-						'custom' => false,
+				'blocks' => array(
+					'core/paragraph' => array(
+						'color' => array(
+							'custom' => false,
+						),
 					),
 				),
 			),
 			'styles'   => array(
-				$root_name => array(
-					'typography' => array(
-						'fontSize' => '12',
-					),
+				'typography' => array(
+					'fontSize' => '12',
 				),
 			),
 		);
 
 		$add_new_block = array(
+			'version'  => 1,
 			'settings' => array(
-				'core/list' => array(
-					'color' => array(
-						'custom' => false,
+				'blocks' => array(
+					'core/list' => array(
+						'color' => array(
+							'custom' => false,
+						),
 					),
 				),
 			),
 			'styles'   => array(
-				'core/list' => array(
-					'typography' => array(
-						'fontSize' => '12',
-					),
-					'color'      => array(
-						'background' => 'brown',
+				'blocks' => array(
+					'core/list' => array(
+						'typography' => array(
+							'fontSize' => '12',
+						),
+						'color'      => array(
+							'background' => 'brown',
+						),
 					),
 				),
 			),
 		);
 
 		$add_key_in_settings = array(
+			'version'  => 1,
 			'settings' => array(
-				$root_name => array(
-					'color' => array(
-						'customGradient' => true,
-					),
+				'color' => array(
+					'customGradient' => true,
 				),
 			),
 		);
 
 		$update_key_in_settings = array(
+			'version'  => 1,
 			'settings' => array(
-				$root_name => array(
-					'color' => array(
-						'custom' => true,
-					),
+				'color' => array(
+					'custom' => true,
 				),
 			),
 		);
 
 		$add_styles = array(
-			'styles' => array(
-				'core/group' => array(
-					'spacing' => array(
-						'padding' => array(
-							'top' => '12px',
+			'version' => 1,
+			'styles'  => array(
+				'blocks' => array(
+					'core/group' => array(
+						'spacing' => array(
+							'padding' => array(
+								'top' => '12px',
+							),
 						),
 					),
 				),
@@ -420,11 +424,14 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_key_in_styles = array(
-			'styles' => array(
-				'core/group' => array(
-					'spacing' => array(
-						'padding' => array(
-							'bottom' => '12px',
+			'version' => 1,
+			'styles'  => array(
+				'blocks' => array(
+					'core/group' => array(
+						'spacing' => array(
+							'padding' => array(
+								'bottom' => '12px',
+							),
 						),
 					),
 				),
@@ -432,44 +439,46 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$add_invalid_context = array(
-			'styles' => array(
-				'core/para' => array(
-					'typography' => array(
-						'lineHeight' => '12',
+			'version' => 1,
+			'styles'  => array(
+				'blocks' => array(
+					'core/para' => array(
+						'typography' => array(
+							'lineHeight' => '12',
+						),
 					),
 				),
 			),
 		);
 
 		$update_presets = array(
+			'version'  => 1,
 			'settings' => array(
-				$root_name => array(
-					'color'      => array(
-						'palette'   => array(
-							array(
-								'slug'  => 'blue',
-								'color' => 'blue',
-							),
-						),
-						'gradients' => array(
-							array(
-								'slug'     => 'gradient',
-								'gradient' => 'gradient',
-							),
+				'color'      => array(
+					'palette'   => array(
+						array(
+							'slug'  => 'blue',
+							'color' => 'blue',
 						),
 					),
-					'typography' => array(
-						'fontSizes'    => array(
-							array(
-								'slug' => 'fontSize',
-								'size' => 'fontSize',
-							),
+					'gradients' => array(
+						array(
+							'slug'     => 'gradient',
+							'gradient' => 'gradient',
 						),
-						'fontFamilies' => array(
-							array(
-								'slug'       => 'fontFamily',
-								'fontFamily' => 'fontFamily',
-							),
+					),
+				),
+				'typography' => array(
+					'fontSizes'    => array(
+						array(
+							'slug' => 'fontSize',
+							'size' => 'fontSize',
+						),
+					),
+					'fontFamilies' => array(
+						array(
+							'slug'       => 'fontFamily',
+							'fontFamily' => 'fontFamily',
 						),
 					),
 				),
@@ -477,70 +486,71 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
+			'version'  => 1,
 			'settings' => array(
-				$root_name       => array(
-					'color'      => array(
-						'custom'         => true,
-						'customGradient' => true,
-						'palette'        => array(
-							array(
-								'slug'  => 'blue',
-								'color' => 'blue',
-							),
-						),
-						'gradients'      => array(
-							array(
-								'slug'     => 'gradient',
-								'gradient' => 'gradient',
-							),
+				'color'      => array(
+					'custom'         => true,
+					'customGradient' => true,
+					'palette'        => array(
+						array(
+							'slug'  => 'blue',
+							'color' => 'blue',
 						),
 					),
-					'typography' => array(
-						'fontSizes'    => array(
-							array(
-								'slug' => 'fontSize',
-								'size' => 'fontSize',
-							),
-						),
-						'fontFamilies' => array(
-							array(
-								'slug'       => 'fontFamily',
-								'fontFamily' => 'fontFamily',
-							),
+					'gradients'      => array(
+						array(
+							'slug'     => 'gradient',
+							'gradient' => 'gradient',
 						),
 					),
 				),
-				'core/paragraph' => array(
-					'color' => array(
-						'custom' => false,
+				'typography' => array(
+					'fontSizes'    => array(
+						array(
+							'slug' => 'fontSize',
+							'size' => 'fontSize',
+						),
+					),
+					'fontFamilies' => array(
+						array(
+							'slug'       => 'fontFamily',
+							'fontFamily' => 'fontFamily',
+						),
 					),
 				),
-				'core/list'      => array(
-					'color' => array(
-						'custom' => false,
+				'blocks' => array(
+					'core/paragraph' => array(
+						'color' => array(
+							'custom' => false,
+						),
+					),
+					'core/list'      => array(
+						'color' => array(
+							'custom' => false,
+						),
 					),
 				),
 			),
 			'styles'   => array(
-				$root_name   => array(
-					'typography' => array(
-						'fontSize' => '12',
-					),
+				'typography' => array(
+					'fontSize' => '12',
 				),
-				'core/group' => array(
-					'spacing' => array(
-						'padding' => array(
-							'top'    => '12px',
-							'bottom' => '12px',
+				'blocks' => array(
+					'core/group' => array(
+						'spacing' => array(
+							'padding' => array(
+								'top'    => '12px',
+								'bottom' => '12px',
+							),
 						),
 					),
-				),
-				'core/list'  => array(
-					'typography' => array(
-						'fontSize' => '12',
-					),
-					'color'      => array(
-						'background' => 'brown',
+					'core/list'  => array(
+						'typography' => array(
+							'fontSize' => '12',
+						),
+						'color'      => array(
+							'background' => 'brown',
+						),
 					),
 				),
 			),
@@ -554,9 +564,9 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->merge( new WP_Theme_JSON( $add_key_in_styles ) );
 		$theme_json->merge( new WP_Theme_JSON( $add_invalid_context ) );
 		$theme_json->merge( new WP_Theme_JSON( $update_presets ) );
-		$result = $theme_json->get_raw_data();
+		$actual = $theme_json->get_raw_data();
 
-		$this->assertEqualSetsWithIndex( $expected, $result );
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
 	function test_remove_insecure_properties_removes_unsafe_styles() {

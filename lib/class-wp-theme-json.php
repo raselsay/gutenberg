@@ -870,34 +870,57 @@ class WP_Theme_JSON {
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		// The array_replace_recursive algorithm merges at the leaf level.
-		// This means that when a leaf value is an array,
+		// This means that when a leaf value in a theme.json structure is an array,
 		// the incoming array won't replace the existing,
 		// but the numeric indexes are used for replacement.
 		//
-		// These are the cases that have array values at the leaf levels.
+		// For those cases, we need to take the incoming array directly:
+		//
+		// - colors: palette, gradients
+		// - spacing: units
+		// - typography: fontSizes, fontFamilies
+		// - custom
+
+		// Process top-level.
+		if ( isset( $incoming_data['settings']['color']['palette'] ) ) {
+			$this->theme_json['settings']['color']['palette'] = $incoming_data['settings']['color']['palette'];
+		}
+		if ( isset( $incoming_data['settings']['color']['gradients'] ) ) {
+			$this->theme_json['settings']['color']['gradients'] = $incoming_data['settings']['color']['gradients'];
+		}
+		if ( isset( $incoming_data['settings']['spacing']['units'] ) ) {
+			$this->theme_json['settings']['spacing']['units'] = $incoming_data['settings']['spacing']['units'];
+		}
+		if ( isset( $incoming_data['settings']['typography']['fontSizes'] ) ) {
+			$this->theme_json['settings']['typography']['fontSizes'] = $incoming_data['settings']['typography']['fontSizes'];
+		}
+		if ( isset( $incoming_data['settings']['typography']['fontFamilies'] ) ) {
+			$this->theme_json['settings']['typography']['fontFamilies'] = $incoming_data['settings']['typography']['fontFamilies'];
+		}
+		if ( isset( $incoming_data['settings']['custom'] ) ) {
+			$this->theme_json['settings']['custom'] = $incoming_data['settings']['custom'];
+		}
+
+		// Process 'blocks'.
 		$block_metadata = self::get_blocks_metadata();
 		foreach ( $block_metadata as $block_selector => $meta ) {
-			// Color presets: palette & gradients.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['color']['palette'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['color']['palette'] = $incoming_data['settings'][ $block_selector ]['color']['palette'];
+			if ( isset( $incoming_data['settings']['blocks'][ $block_selector ]['color']['palette'] ) ) {
+				$this->theme_json['settings']['blocks'][ $block_selector ]['color']['palette'] = $incoming_data['settings']['blocks'][ $block_selector ]['color']['palette'];
 			}
-			if ( isset( $incoming_data['settings'][ $block_selector ]['color']['gradients'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['color']['gradients'] = $incoming_data['settings'][ $block_selector ]['color']['gradients'];
+			if ( isset( $incoming_data['settings']['blocks'][ $block_selector ]['color']['gradients'] ) ) {
+				$this->theme_json['settings']['blocks'][ $block_selector ]['color']['gradients'] = $incoming_data['settings']['blocks'][ $block_selector ]['color']['gradients'];
 			}
-			// Spacing: units.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['spacing']['units'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['spacing']['units'] = $incoming_data['settings'][ $block_selector ]['spacing']['units'];
+			if ( isset( $incoming_data['settings']['blocks'][ $block_selector ]['spacing']['units'] ) ) {
+				$this->theme_json['settings']['blocks'][ $block_selector ]['spacing']['units'] = $incoming_data['settings']['blocks'][ $block_selector ]['spacing']['units'];
 			}
-			// Typography presets: fontSizes & fontFamilies.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['typography']['fontSizes'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['typography']['fontSizes'] = $incoming_data['settings'][ $block_selector ]['typography']['fontSizes'];
+			if ( isset( $incoming_data['settings']['blocks'][ $block_selector ]['typography']['fontSizes'] ) ) {
+				$this->theme_json['settings']['blocks'][ $block_selector ]['typography']['fontSizes'] = $incoming_data['settings']['blocks'][ $block_selector ]['typography']['fontSizes'];
 			}
-			if ( isset( $incoming_data['settings'][ $block_selector ]['typography']['fontFamilies'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['typography']['fontFamilies'] = $incoming_data['settings'][ $block_selector ]['typography']['fontFamilies'];
+			if ( isset( $incoming_data['settings']['blocks'][ $block_selector ]['typography']['fontFamilies'] ) ) {
+				$this->theme_json['settings']['blocks'][ $block_selector ]['typography']['fontFamilies'] = $incoming_data['settings']['blocks'][ $block_selector ]['typography']['fontFamilies'];
 			}
-			// Custom section.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['custom'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['custom'] = $incoming_data['settings'][ $block_selector ]['custom'];
+			if ( isset( $incoming_data['settings']['blocks'][ $block_selector ]['custom'] ) ) {
+				$this->theme_json['settings']['blocks'][ $block_selector ]['custom'] = $incoming_data['settings']['blocks'][ $block_selector ]['custom'];
 			}
 		}
 	}

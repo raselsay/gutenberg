@@ -3,6 +3,7 @@
 class WP_Theme_JSON_Schema_V1 {
 
 	const SCHEMA = array(
+		'version'         => null,
 		'customTemplates' => null,
 		'templateParts'   => null,
 		'styles'          => array(
@@ -81,9 +82,14 @@ class WP_Theme_JSON_Schema_V1 {
 		$output = array_intersect_key( $input, self::SCHEMA );
 
 		foreach ( array( 'settings', 'styles' ) as $subtree ) {
+			if( ! isset( $output[ $subtree ] ) ) {
+				continue;
+			}
+
 			// Remove settings & styles subtrees if they aren't arrays.
 			if ( isset( $output[ $subtree ] ) && ! is_array( $output[ $subtree ] ) ) {
 				unset( $output[ $subtree ] );
+				continue;
 			}
 
 			// Remove invalid keys according to the schema of the subtree:
