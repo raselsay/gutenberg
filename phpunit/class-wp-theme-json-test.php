@@ -312,7 +312,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'core/post-title/h2' => array(
+						'core/heading/h2' => array(
 							'color'      => array(
 								'text'       => 'red',
 								'background' => 'blue',
@@ -328,7 +328,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			':root{--wp--preset--color--grey: grey;}h2.wp-block-post-title{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}',
+			':root{--wp--preset--color--grey: grey;}h2{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}',
 			$theme_json->get_stylesheet()
 		);
 	}
