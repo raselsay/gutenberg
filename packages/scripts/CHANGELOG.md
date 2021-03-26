@@ -2,10 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename `format-js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   Include YAML files when formatting files with `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+
 ### Enhancements
 
 -   The bundled `babel-loader` dependency has been updated from requiring `^8.1.0` to requiring `^8.2.2` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
--   Include YAML files when formatting files with `format-js` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
 
 ## 14.0.0 (2021-03-17)
 

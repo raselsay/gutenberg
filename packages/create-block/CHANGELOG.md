@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   Include YAML files when formatting files with `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+
 ### Enhancement
 
 -   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
