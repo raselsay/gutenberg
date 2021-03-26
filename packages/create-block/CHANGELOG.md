@@ -5,7 +5,6 @@
 ### Breaking Changes
 
 -   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
--   Include YAML files when formatting files with `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
 
 ### Enhancement
 
