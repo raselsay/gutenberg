@@ -292,7 +292,7 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.{js,ts,tsx}": [
+		"*.{js,ts,tsx,yml}": [
 			"wp-scripts format",
 			"wp-scripts lint-js"
 		],
