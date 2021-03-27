@@ -11,11 +11,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__experimentalBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import {
-	DropZoneProvider,
-	SlotFillProvider,
-	Popover,
-} from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -68,63 +64,61 @@ export default function SidebarBlockEditor( { sidebar, inserter } ) {
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<div hidden={ isInspectorOpened && ! isInspectorAnimating }>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ onInput }
-							onChange={ onChange }
-							settings={ settings }
-							useSubRegistry={ false }
-						>
-							<BlockEditorKeyboardShortcuts />
+				<div hidden={ isInspectorOpened && ! isInspectorAnimating }>
+					<BlockEditorProvider
+						value={ blocks }
+						onInput={ onInput }
+						onChange={ onChange }
+						settings={ settings }
+						useSubRegistry={ false }
+					>
+						<BlockEditorKeyboardShortcuts />
 
-							<Header
-								inserter={ inserter }
-								isInserterOpened={ isInserterOpened }
-								setIsInserterOpened={ setIsInserterOpened }
-							/>
+						<Header
+							inserter={ inserter }
+							isInserterOpened={ isInserterOpened }
+							setIsInserterOpened={ setIsInserterOpened }
+						/>
 
-							<BlockSelectionClearer>
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList />
-									</ObserveTyping>
-								</WritingFlow>
-							</BlockSelectionClearer>
-						</BlockEditorProvider>
+						<BlockSelectionClearer>
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList />
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</BlockEditorProvider>
 
-						<Popover.Slot name="block-toolbar" />
-					</div>
+					<Popover.Slot name="block-toolbar" />
+				</div>
 
-					{ createPortal(
-						<Inspector
-							isOpened={ isInspectorOpened }
-							isAnimating={ isInspectorAnimating }
-							setInspectorOpenState={ setInspectorOpenState }
-						/>,
-						parentContainer
+				{ createPortal(
+					<Inspector
+						isOpened={ isInspectorOpened }
+						isAnimating={ isInspectorAnimating }
+						setInspectorOpenState={ setInspectorOpenState }
+					/>,
+					parentContainer
+				) }
+
+				<__experimentalBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton
+							onClick={ () => {
+								// Open the inspector,
+								setInspectorOpenState( 'OPEN' );
+								// Then close the dropdown menu.
+								onClose();
+							} }
+						/>
 					) }
+				</__experimentalBlockSettingsMenuFirstItem>
 
-					<__experimentalBlockSettingsMenuFirstItem>
-						{ ( { onClose } ) => (
-							<BlockInspectorButton
-								onClick={ () => {
-									// Open the inspector,
-									setInspectorOpenState( 'OPEN' );
-									// Then close the dropdown menu.
-									onClose();
-								} }
-							/>
-						) }
-					</__experimentalBlockSettingsMenuFirstItem>
-
-					{
-						// We have to portal this to the parent of both the editor and the inspector,
-						// so that the popovers will appear above both of them.
-						createPortal( <Popover.Slot />, parentContainer )
-					}
-				</DropZoneProvider>
+				{
+					// We have to portal this to the parent of both the editor and the inspector,
+					// so that the popovers will appear above both of them.
+					createPortal( <Popover.Slot />, parentContainer )
+				}
 			</SlotFillProvider>
 		</>
 	);
