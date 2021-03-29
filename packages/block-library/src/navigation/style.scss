@@ -189,7 +189,7 @@
 }
 
 // Always show submenus fully expanded inside the modal menu.
-.wp-block-navigation .wp-block-navigation__responsive-container-content.is-menu-open {
+.wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
 	// This is clickable at the moment, though does not seem tabbable.
 	// @todo, verify that it doesnt' need a focus style.
 	&:focus {
